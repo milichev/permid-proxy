@@ -1,0 +1,23 @@
+{
+  "name": "permid-proxy",
+  "version": "0.1.1",
+  "main": "index.js",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "hapi": "^16.6.2",
+    "yargs": "^11.0.0"
+  },
+  "scripts": {
+    "start": "nodemon --watch index.js index.js"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "nodemon": "^1.17.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/milichev/permid-proxy"
+  },
+  "author": "vadim.milichev@gmail.com"
+}
