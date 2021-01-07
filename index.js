@@ -1,51 +1,70 @@
-const hapi = require('hapi');
-const axios = require('axios');
-const argv = require('yargs').argv;
+const hapi = require("@hapi/hapi");
+const axios = require("axios");
+const argv = require("yargs").argv;
 
 const port = argv.PORT || 1380;
-const host = argv.HOST || 'localhost';
-const token = argv.PERMID_TOKEN || '';
+const host = argv.HOST || "localhost";
+const token = argv.PERMID_TOKEN || "";
 
 if (!token) {
-  throw new Error('No PermID token provided');
+  throw new Error("No PermID token provided");
 }
 
 const server = new hapi.Server({
-  debug: {log: ['error', 'info']},
+  port,
+  host,
+  debug: { log: ["error", "info"] },
 });
 
-server.connection({port, host});
+const path = "/api/permid/search";
 
 // noinspection JSUnusedGlobalSymbols
 server.route({
-  method: 'GET',
-  path: '/api/permid/search',
+  method: "GET",
+  path,
   config: {
     cors: {
-      origin: ['*'],
-      exposedHeaders: ['Authorization'],
+      origin: ["*"],
+      exposedHeaders: ["Authorization"],
     },
   },
-  handler(request, reply) {
+  async handler(request, h) {
     if (!request.query.q) {
-      return reply('Required query string parameter q missing')
-        .code(400);
+      return h.response("Required query string parameter q missing").code(400);
     }
 
-    axios.get(
-      `https://api.thomsonreuters.com/permid/search?q=${encodeURIComponent(
-        request.query.q)}`,
-      {
-        headers: {'X-AG-Access-Token': token},
-      },
-         )
-         .then(permIdResponse => reply(permIdResponse.data));
+    return axios
+      .get(
+        `https://api.thomsonreuters.com/permid/search?q=${encodeURIComponent(
+          request.query.q
+        )}`,
+        {
+          headers: { "X-AG-Access-Token": token },
+        }
+      )
+      .then((permIdResponse) => h.response(permIdResponse.data))
+      .catch((error) => {
+        const { data, status, headers } = error.response;
+        return h
+          .response({
+            error: {
+              message: "The underlying service returned error",
+              status,
+              data,
+              headers,
+            },
+          })
+          .code(500);
+      });
   },
 });
 
-server.start((err) => {
-  if (err) {
-    throw err;
-  }
-  console.log(`Server running at: ${server.info.uri}`);
-});
+server
+  .start()
+  .then(() => {
+    console.log(`Server is running at: ${server.info.uri}${path}`);
+  })
+  .catch((err) => {
+    console.error("Error starting server", err);
+    process.exit(1);
+  });

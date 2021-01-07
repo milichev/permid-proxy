@@ -4,16 +4,16 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "axios": "^0.18.0",
-    "hapi": "^16.6.2",
-    "yargs": "^11.0.0"
+    "@hapi/hapi": "^20.0.3",
+    "axios": "^0.21.1",
+    "yargs": "^16.2.0"
   },
   "scripts": {
     "start": "nodemon --watch index.js index.js"
   },
   "devDependencies": {
-    "eslint": "^4.18.1",
-    "nodemon": "^1.17.1"
+    "eslint": "^7.17.0",
+    "nodemon": "^2.0.7"
   },
   "repository": {
     "type": "git",
